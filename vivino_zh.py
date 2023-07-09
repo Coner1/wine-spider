@@ -173,7 +173,7 @@ def run(pw: Playwright) -> None:
         page.on("response", on_response)
         condition_logic(page)
 
-    page.pause()
+    # page.pause()
     context.close()
     browser.close()
 
