@@ -6,7 +6,7 @@ from urllib import parse
 
 from playwright.sync_api import Playwright, sync_playwright, Locator, Page, Response
 
-from monitor import start_monitor
+from config import condition_config
 
 data_total_num = 0
 data_total_pages = 0
@@ -32,105 +32,135 @@ OUTPUT_RUNTIME_FILE_PATH = os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_RUNTIME_DA
 
 
 def condition_logic(page: Page):
-    # 葡萄酒类型选项列表
-    type_list = page.locator(
-        "div.search-list > div.content > div.main-content > div.left-content > div.grape-type > div.type-item") \
-        .all()
-    # 评分选项列表
-    rate_list = page.locator(
-        "div.search-list > div.content > div.main-content > div.left-content > div.rate-class  div.check-box").all()
+    if condition_config["searchEnable"]:
+        search_input = page.locator(
+            "div > div.header > div > div > div.container-top > div.logo-search > div.search > div > div > input")
+        search_input.type(condition_config["searchWords"], delay=100)
+    if condition_config["wineTypeEnable"]:
+        # 葡萄酒类别 选项列表
+        type_list = page.locator(
+            "div.search-list > div.content > div.main-content > div.left-content > div.grape-type > div.type-item") \
+            .all()
+        type_list[condition_config["wineTypeIndex"]].click()
+
+    if condition_config["scoreEnable"]:
+        # 平均评分选项列表
+        rate_list = page.locator(
+            "div.search-list > div.content > div.main-content > div.left-content > div.rate-class  div.check-box").all()
+        rate_list[condition_config["scoreIndex"]].click()
+
     search_items = page.locator(
         "div.search-list > div.content > div.main-content > div.left-content > div.search-items")
-    # 品种选项列表
-    pinzhong = search_items.all()[0].locator("div.select-content > div.type-item").all()
-    # 国家选项列表
-    guojia = search_items.all()[2].locator("div.select-content > div.type-item").all()
-    # 产地选项列表
-    chandi = search_items.all()[1].locator("div.select-content > div.type-item").all()
-    # 风格选项列表
-    fengge = search_items.all()[3].locator("div.select-content > div.type-item").all()
-    # 配餐选项列表
-    peican = search_items.all()[4].locator("div.select-content > div.type-item").all()
+    if condition_config["breedEnable"]:
+        # 葡萄品种 选项列表
+        breed = search_items.all()[0].locator("div.select-content > div.type-item").all()
+        breed[condition_config["breedIndex"]].click()
+    if condition_config["areaEnable"]:
+        # 产区 选项列表
+        area = search_items.all()[1].locator("div.select-content > div.type-item").all()
+        area[condition_config["areaIndex"]].click()
+    if condition_config["nationEnable"]:
+        # 国家 选项列表
+        nation = search_items.all()[2].locator("div.select-content > div.type-item").all()
+        nation[condition_config["nationIndex"]].click()
+    if condition_config["styleEnable"]:
+        # 葡萄酒风格 选项列表
+        style = search_items.all()[3].locator("div.select-content > div.type-item").all()
+        style[condition_config["styleIndex"]].click()
+    if condition_config["assortedEnable"]:
+        # 配餐 选项列表
+        assorted = search_items.all()[4].locator("div.select-content > div.type-item").all()
+        assorted[condition_config["assortedIndex"]].click()
 
-    global disRepFlag, current_page, OUTPUT_DIRECTORY_PATH
-    base_path = OUTPUT_DIRECTORY_PATH
+    load_next_page(page)
+    #
+    # global disRepFlag, current_page, OUTPUT_DIRECTORY_PATH
+    # base_path = OUTPUT_DIRECTORY_PATH
+    #
+    # OUTPUT_DIRECTORY_PATH = base_path + "-type"
+    #
+    # for cond1 in type_list:
+    #     cond1.click()
+    #     disRepFlag = False
+    #     disRepDict.clear()
+    #     current_page = 1
+    #     page.wait_for_timeout(random.randrange(3000, 6000))
+    #     load_next_page(page)
+    #     cond1.click()
+    #
+    # OUTPUT_DIRECTORY_PATH = base_path + "-rate"
+    # for cond2 in rate_list:
+    #     cond2.click()
+    #     disRepFlag = False
+    #     disRepDict.clear()
+    #     current_page = 1
+    #     page.wait_for_timeout(random.randrange(3000, 6000))
+    #     load_next_page(page)
+    #
+    # OUTPUT_DIRECTORY_PATH = base_path + "-pinzhong"
+    # for cond3 in pinzhong:
+    #     cond3.click()
+    #     disRepFlag = False
+    #     disRepDict.clear()
+    #     current_page = 1
+    #     page.wait_for_timeout(random.randrange(3000, 6000))
+    #     load_next_page(page)
+    #     pinzhong[0].click()
+    #
+    # OUTPUT_DIRECTORY_PATH = base_path + "-guojia"
+    # for cond4 in guojia:
+    #     cond4.click()
+    #     disRepFlag = False
+    #     disRepDict.clear()
+    #     current_page = 1
+    #     page.wait_for_timeout(random.randrange(3000, 6000))
+    #     load_next_page(page)
+    #     guojia[0].click()
+    #
+    # OUTPUT_DIRECTORY_PATH = base_path + "-chandi"
+    # for cond10 in chandi:
+    #     cond10.click()
+    #     disRepFlag = False
+    #     disRepDict.clear()
+    #     current_page = 1
+    #     page.wait_for_timeout(random.randrange(3000, 6000))
+    #     load_next_page(page)
+    #     chandi[0].click()
+    #
+    # OUTPUT_DIRECTORY_PATH = base_path + "-fengge"
+    # for cond5 in fengge:
+    #     cond5.click()
+    #     # for cond6 in peican.all():
+    #     #     cond6.click()
+    #     # for cond8 in sort_list.all():
+    #     #     cond8.click()
+    #     disRepFlag = False
+    #     disRepDict.clear()
+    #     current_page = 1
+    #     page.wait_for_timeout(random.randrange(3000, 6000))
+    #     load_next_page(page)
+    #     fengge[0].click()
+    #
+    # OUTPUT_DIRECTORY_PATH = base_path + "-peican"
+    # for cond12 in peican:
+    #     cond12.click()
+    #     # for cond6 in peican.all():
+    #     #     cond6.click()
+    #     # for cond8 in sort_list.all():
+    #     #     cond8.click()
+    #     disRepFlag = False
+    #     disRepDict.clear()
+    #     current_page = 1
+    #     page.wait_for_timeout(random.randrange(3000, 6000))
+    #     load_next_page(page)
+    #     peican[0].click()
 
-    OUTPUT_DIRECTORY_PATH = base_path + "-type"
-    for cond1 in type_list:
-        cond1.click()
-        disRepFlag = False
-        disRepDict.clear()
-        current_page = 1
-        page.wait_for_timeout(random.randrange(3000, 6000))
-        load_next_page(page)
-        cond1.click()
 
-    OUTPUT_DIRECTORY_PATH = base_path + "-rate"
-    for cond2 in rate_list:
-        cond2.click()
-        disRepFlag = False
-        disRepDict.clear()
-        current_page = 1
-        page.wait_for_timeout(random.randrange(3000, 6000))
-        load_next_page(page)
-
-    OUTPUT_DIRECTORY_PATH = base_path + "-pinzhong"
-    for cond3 in pinzhong:
-        cond3.click()
-        disRepFlag = False
-        disRepDict.clear()
-        current_page = 1
-        page.wait_for_timeout(random.randrange(3000, 6000))
-        load_next_page(page)
-        pinzhong[0].click()
-
-    OUTPUT_DIRECTORY_PATH = base_path + "-guojia"
-    for cond4 in guojia:
-        cond4.click()
-        disRepFlag = False
-        disRepDict.clear()
-        current_page = 1
-        page.wait_for_timeout(random.randrange(3000, 6000))
-        load_next_page(page)
-        guojia[0].click()
-
-    OUTPUT_DIRECTORY_PATH = base_path + "-chandi"
-    for cond10 in chandi:
-        cond10.click()
-        disRepFlag = False
-        disRepDict.clear()
-        current_page = 1
-        page.wait_for_timeout(random.randrange(3000, 6000))
-        load_next_page(page)
-        chandi[0].click()
-
-    OUTPUT_DIRECTORY_PATH = base_path + "-fengge"
-    for cond5 in fengge:
-        cond5.click()
-        # for cond6 in peican.all():
-        #     cond6.click()
-        # for cond8 in sort_list.all():
-        #     cond8.click()
-        disRepFlag = False
-        disRepDict.clear()
-        current_page = 1
-        page.wait_for_timeout(random.randrange(3000, 6000))
-        load_next_page(page)
-        fengge[0].click()
-
-    OUTPUT_DIRECTORY_PATH = base_path + "-peican"
-    for cond12 in peican:
-        cond12.click()
-        # for cond6 in peican.all():
-        #     cond6.click()
-        # for cond8 in sort_list.all():
-        #     cond8.click()
-        disRepFlag = False
-        disRepDict.clear()
-        current_page = 1
-        page.wait_for_timeout(random.randrange(3000, 6000))
-        load_next_page(page)
-        peican[0].click()
+def print_list(array):
+    print_list_array = []
+    for i1, v1 in enumerate(array):
+        print_list_array.append({i1, v1.text_content()})
+    print(print_list_array)
 
 
 def run(pw: Playwright) -> None:
@@ -182,12 +212,12 @@ def load_next_page(page: Page):
         while True:
             right_content = page.locator("div.search-list > div.content > div.main-content > div.right-content")
             loading_locator = right_content.locator("div.el-loading-mask")
-            print(loading_locator.count())
+            print("waiting for loading, 1s")
             if loading_locator.count() <= 0:
                 break
             elif loading_locator.is_hidden():
                 break
-            page.wait_for_timeout(random.randrange(100, 1000))
+            page.wait_for_timeout(1000)
 
         next_button = right_content.locator("div.page > div > button.btn-next")
         if next_button.is_disabled():
@@ -256,7 +286,7 @@ def append_to_file(array: []):
                 f.write("\n")
                 disRepDict[item["uuid"]] = "exists"
             else:
-                disRepFlag = True
+                # disRepFlag = True
                 print(f"item exists,uuid={item['uuid']}")
 
     with open(OUTPUT_RUNTIME_FILE_PATH, mode='w', encoding="utf-8") as f:
@@ -317,7 +347,7 @@ def check_path():
 
 
 # start monitor
-start_monitor()
+# start_monitor()
 cp = configparser.ConfigParser()
 cp.read(OUTPUT_RUNTIME_FILE_PATH)
 if len(cp.sections()) == 0:
@@ -326,9 +356,9 @@ if len(cp.sections()) == 0:
     cp.set("main", "data_total_pages", "0")
     cp.set("main", "current_page", "0")
     # Create the file
-    with open(OUTPUT_RUNTIME_FILE_PATH, mode='w', encoding="utf-8") as file:
-        # Write some initial content to the file if desired
-        cp.write(file)
+    # with open(OUTPUT_RUNTIME_FILE_PATH, mode='w', encoding="utf-8") as file:
+    #     # Write some initial content to the file if desired
+    #     cp.write(file)
 else:
     data_total_num = int(cp.get("main", "data_total_num"))
     data_total_pages = int(cp.get("main", "data_total_pages"))
