@@ -1,4 +1,3 @@
-import configparser
 import json
 import os
 import random
@@ -12,148 +11,123 @@ data_total_num = 0
 data_total_pages = 0
 current_page = 0
 
-# 防重标志
-disRepFlag = False
-# 防重字典
-disRepDict = {}
-
 # Define the directory path
 # 输出数据根目录
 # 结构如下
 # --root
 #    --data.txt
 #    --images
-OUTPUT_DIRECTORY_PATH = '/Volumes/safeis-512-33724/output'
+OUTPUT_DIRECTORY_PATH = condition_config["OUTPUT_DIRECTORY_PATH"]
 OUTPUT_FILE_NAME = 'data.txt'
-OUTPUT_RUNTIME_DATA_FILE = '.runtime'
-
-# Define the file path
-OUTPUT_RUNTIME_FILE_PATH = os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_RUNTIME_DATA_FILE)
 
 
 def condition_logic(page: Page):
+    global OUTPUT_DIRECTORY_PATH
+    base_path = OUTPUT_DIRECTORY_PATH
     if condition_config["searchEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_search_input"
         search_input = page.locator(
             "div > div.header > div > div > div.container-top > div.logo-search > div.search > div > div > input")
         search_input.type(condition_config["searchWords"], delay=100)
     if condition_config["wineTypeEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_type_list"
         # 葡萄酒类别 选项列表
         type_list = page.locator(
             "div.search-list > div.content > div.main-content > div.left-content > div.grape-type > div.type-item") \
             .all()
-        type_list[condition_config["wineTypeIndex"]].click()
+        wine_type_index = condition_config["wineTypeIndex"]
+        for i1, cond1 in enumerate(type_list):
+            if i1 < wine_type_index:
+                continue
+            print(f"type_list, index={i1},value={cond1.text_content()}")
+            cond1.click()
+            page.wait_for_timeout(random.randrange(3000, 6000))
+            load_next_page(page)
+            cond1.click()
 
     if condition_config["scoreEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_rate_list"
         # 平均评分选项列表
-        rate_list = page.locator(
+        score_list = page.locator(
             "div.search-list > div.content > div.main-content > div.left-content > div.rate-class  div.check-box").all()
-        rate_list[condition_config["scoreIndex"]].click()
+        score_index = condition_config["scoreIndex"]
+        for i2, cond2 in enumerate(score_list):
+            if i2 < score_index:
+                continue
+            print(f"rate_list, index={i2},value={cond2.text_content()}")
+            cond2.click()
+            page.wait_for_timeout(random.randrange(1000, 3000))
+            load_next_page(page)
 
     search_items = page.locator(
         "div.search-list > div.content > div.main-content > div.left-content > div.search-items")
     if condition_config["breedEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_breed"
         # 葡萄品种 选项列表
         breed = search_items.all()[0].locator("div.select-content > div.type-item").all()
-        breed[condition_config["breedIndex"]].click()
+        breed_index = condition_config["breedIndex"]
+        for i3, cond3 in enumerate(breed):
+            if i3 < breed_index:
+                continue
+            print(f"breed_list, index={i3},value={cond3.text_content()}")
+            cond3.click()
+            page.wait_for_timeout(random.randrange(1000, 3000))
+            load_next_page(page)
+            breed[0].click()
     if condition_config["areaEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_area"
         # 产区 选项列表
         area = search_items.all()[1].locator("div.select-content > div.type-item").all()
-        area[condition_config["areaIndex"]].click()
+        area_index = condition_config["areaIndex"]
+        for i4, cond4 in enumerate(area):
+            if i4 < area_index:
+                continue
+            print(f"area_list, index={i4},value={cond4.text_content()}")
+            cond4.click()
+            page.wait_for_timeout(random.randrange(1000, 6000))
+            load_next_page(page)
+            area[0].click()
+
     if condition_config["nationEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_nation"
         # 国家 选项列表
         nation = search_items.all()[2].locator("div.select-content > div.type-item").all()
-        nation[condition_config["nationIndex"]].click()
+        nation_index = condition_config["nationIndex"]
+        for i5, cond5 in enumerate(nation):
+            if i5 < nation_index:
+                continue
+            print(f"nation, index={i5},value={cond5.text_content()}")
+            cond5.click()
+            page.wait_for_timeout(random.randrange(1000, 6000))
+            load_next_page(page)
+            nation[0].click()
+
     if condition_config["styleEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_style"
         # 葡萄酒风格 选项列表
         style = search_items.all()[3].locator("div.select-content > div.type-item").all()
-        style[condition_config["styleIndex"]].click()
+        style_index = condition_config["styleIndex"]
+        for i6, cond6 in enumerate(style):
+            if i6 < style_index:
+                continue
+            print(f"style, index={i6},value={cond6.text_content()}")
+            cond6.click()
+            page.wait_for_timeout(random.randrange(1000, 6000))
+            load_next_page(page)
+            style[0].click()
     if condition_config["assortedEnable"]:
+        OUTPUT_DIRECTORY_PATH = base_path + "_assorted"
         # 配餐 选项列表
         assorted = search_items.all()[4].locator("div.select-content > div.type-item").all()
-        assorted[condition_config["assortedIndex"]].click()
-
-    load_next_page(page)
-    #
-    # global disRepFlag, current_page, OUTPUT_DIRECTORY_PATH
-    # base_path = OUTPUT_DIRECTORY_PATH
-    #
-    # OUTPUT_DIRECTORY_PATH = base_path + "-type"
-    #
-    # for cond1 in type_list:
-    #     cond1.click()
-    #     disRepFlag = False
-    #     disRepDict.clear()
-    #     current_page = 1
-    #     page.wait_for_timeout(random.randrange(3000, 6000))
-    #     load_next_page(page)
-    #     cond1.click()
-    #
-    # OUTPUT_DIRECTORY_PATH = base_path + "-rate"
-    # for cond2 in rate_list:
-    #     cond2.click()
-    #     disRepFlag = False
-    #     disRepDict.clear()
-    #     current_page = 1
-    #     page.wait_for_timeout(random.randrange(3000, 6000))
-    #     load_next_page(page)
-    #
-    # OUTPUT_DIRECTORY_PATH = base_path + "-pinzhong"
-    # for cond3 in pinzhong:
-    #     cond3.click()
-    #     disRepFlag = False
-    #     disRepDict.clear()
-    #     current_page = 1
-    #     page.wait_for_timeout(random.randrange(3000, 6000))
-    #     load_next_page(page)
-    #     pinzhong[0].click()
-    #
-    # OUTPUT_DIRECTORY_PATH = base_path + "-guojia"
-    # for cond4 in guojia:
-    #     cond4.click()
-    #     disRepFlag = False
-    #     disRepDict.clear()
-    #     current_page = 1
-    #     page.wait_for_timeout(random.randrange(3000, 6000))
-    #     load_next_page(page)
-    #     guojia[0].click()
-    #
-    # OUTPUT_DIRECTORY_PATH = base_path + "-chandi"
-    # for cond10 in chandi:
-    #     cond10.click()
-    #     disRepFlag = False
-    #     disRepDict.clear()
-    #     current_page = 1
-    #     page.wait_for_timeout(random.randrange(3000, 6000))
-    #     load_next_page(page)
-    #     chandi[0].click()
-    #
-    # OUTPUT_DIRECTORY_PATH = base_path + "-fengge"
-    # for cond5 in fengge:
-    #     cond5.click()
-    #     # for cond6 in peican.all():
-    #     #     cond6.click()
-    #     # for cond8 in sort_list.all():
-    #     #     cond8.click()
-    #     disRepFlag = False
-    #     disRepDict.clear()
-    #     current_page = 1
-    #     page.wait_for_timeout(random.randrange(3000, 6000))
-    #     load_next_page(page)
-    #     fengge[0].click()
-    #
-    # OUTPUT_DIRECTORY_PATH = base_path + "-peican"
-    # for cond12 in peican:
-    #     cond12.click()
-    #     # for cond6 in peican.all():
-    #     #     cond6.click()
-    #     # for cond8 in sort_list.all():
-    #     #     cond8.click()
-    #     disRepFlag = False
-    #     disRepDict.clear()
-    #     current_page = 1
-    #     page.wait_for_timeout(random.randrange(3000, 6000))
-    #     load_next_page(page)
-    #     peican[0].click()
+        assorted_index = condition_config["assortedIndex"]
+        for i7, cond7 in enumerate(assorted):
+            if i7 < assorted_index:
+                continue
+            print(f"assorted, index={i7},value={cond7.text_content()}")
+            cond7.click()
+            page.wait_for_timeout(random.randrange(1000, 6000))
+            load_next_page(page)
+            assorted[0].click()
 
 
 def print_list(array):
@@ -164,7 +138,7 @@ def print_list(array):
 
 
 def run(pw: Playwright) -> None:
-    browser = pw.chromium.launch(headless=False, channel='chrome')
+    browser = pw.chromium.launch(headless=condition_config["headless"], channel='chrome')
     context = browser.new_context()
     page = context.new_page()
 
@@ -194,7 +168,7 @@ def on_response(resp: Response):
         # data_total = json_obj["data"]["total"]
         # data_pages = json_obj["data"]["pages"]
         append_to_file(data_records)
-        print(f"page data has appended to file, currentPage={current_page}, dict length={len(disRepDict.keys())}")
+        print(f"page data has appended to file")
     if "find-by-uuid" in resp.request.url:
         # print(resp.request.url)
         parsed = parse.urlparse(resp.request.url)
@@ -203,9 +177,7 @@ def on_response(resp: Response):
 
 
 def load_next_page(page: Page):
-    while True:
-        if disRepFlag:
-            break
+    for i in range(20):
         right_content = page.locator("div.search-list > div.content > div.main-content > div.right-content")
         if "没有找到合适的葡萄酒" in right_content.text_content():
             break
@@ -273,28 +245,12 @@ def one_page(right_content: Locator):
 
 
 def append_to_file(array: []):
-    global disRepDict
-    global disRepFlag
-    global current_page
-
     check_path()
 
     with open(os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_FILE_NAME), mode="at", encoding="utf-8") as f:
         for item in array:
-            if disRepDict.get(item["uuid"]) is None:
-                json.dump(item, f, ensure_ascii=False)
-                f.write("\n")
-                disRepDict[item["uuid"]] = "exists"
-            else:
-                # disRepFlag = True
-                print(f"item exists,uuid={item['uuid']}")
-
-    with open(OUTPUT_RUNTIME_FILE_PATH, mode='w', encoding="utf-8") as f:
-        # Write some initial content to the file if desired
-        global current_page
-        cp.set("main", "current_page", str(current_page))
-        cp.write(f)
-        current_page += 1
+            json.dump(item, f, ensure_ascii=False)
+            f.write("\n")
 
 
 def save_image(name, b):
@@ -304,10 +260,10 @@ def save_image(name, b):
         with open(image_full_path, "wb") as f:
             f.write(b)
             print(
-                f"image saved,path={image_full_path}, currentPage={current_page}, dict length={len(disRepDict.keys())}")
+                f"image saved,path={image_full_path}")
     else:
         print(
-            f"image exists, path={image_full_path}, currentPage={current_page}, dict length={len(disRepDict.keys())}")
+            f"image exists, path={image_full_path}")
 
 
 # Create the directory if it doesn't exist
@@ -346,23 +302,12 @@ def check_path():
         print(f"Directory '{image_path}' already exists.")
 
 
-# start monitor
-# start_monitor()
-cp = configparser.ConfigParser()
-cp.read(OUTPUT_RUNTIME_FILE_PATH)
-if len(cp.sections()) == 0:
-    cp.add_section("main")
-    cp.set("main", "data_total_num", "0")
-    cp.set("main", "data_total_pages", "0")
-    cp.set("main", "current_page", "0")
-    # Create the file
-    # with open(OUTPUT_RUNTIME_FILE_PATH, mode='w', encoding="utf-8") as file:
-    #     # Write some initial content to the file if desired
-    #     cp.write(file)
-else:
-    data_total_num = int(cp.get("main", "data_total_num"))
-    data_total_pages = int(cp.get("main", "data_total_pages"))
-    current_page = int(cp.get("main", "current_page"))
+def main():
+    # start monitor
+    # start_monitor()
 
-with sync_playwright() as playwright:
-    run(playwright)
+    with sync_playwright() as playwright:
+        run(playwright)
+
+
+main()
