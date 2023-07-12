@@ -1,15 +1,12 @@
 import json
 import os
 import random
+from datetime import datetime
 from urllib import parse
 
-from playwright.sync_api import Playwright, sync_playwright, Locator, Page, Response
+from playwright.sync_api import Playwright, sync_playwright, Locator, Page, Response, TimeoutError
 
 from config import condition_config
-
-data_total_num = 0
-data_total_pages = 0
-current_page = 0
 
 # Define the directory path
 # 输出数据根目录
@@ -22,6 +19,51 @@ OUTPUT_FILE_NAME = 'data.txt'
 
 
 def condition_logic(page: Page):
+    if condition_config["conditionLogic"] == "condition_logic_combine_breed_area":
+        condition_logic_combine_breed_area(page)
+    elif condition_config["conditionLogic"] == "condition_logic_single_condition":
+        condition_logic_single_condition(page)
+    else:
+        print("error not function")
+
+
+def condition_logic_combine_breed_area(page: Page):
+    search_items = page.locator(
+        "div.search-list > div.content > div.main-content > div.left-content > div.search-items")
+    # 葡萄品种 选项列表
+    breed = search_items.all()[0].locator("div.select-content > div.type-item").all()
+    # 产区 选项列表
+    area = search_items.all()[1].locator("div.select-content > div.type-item").all()
+    area_index = condition_config["areaIndex"]
+    breed_index = condition_config["breedIndex"]
+    for i3, cond3 in enumerate(breed):
+        if i3 < breed_index:
+            continue
+        try:
+            cond3.click()
+
+            for i4, cond4 in enumerate(area):
+                if i4 < area_index:
+                    continue
+                print(f"time.now = {datetime.now()}")
+                print(
+                    f"breed_list, index={i3},value={cond3.text_content()}, area_list, index={i4},value={cond4.text_content()}")
+                try:
+                    cond4.click()
+                    page.wait_for_timeout(random.randrange(1000, 6000))
+                    load_next_page(page)
+                    area[0].click()
+                    condition_config["areaIndex"] = i4
+                except:
+                    continue
+
+            breed[0].click()
+            condition_config["breedIndex"] = i3
+        except:
+            continue
+
+
+def condition_logic_single_condition(page: Page):
     global OUTPUT_DIRECTORY_PATH
     base_path = OUTPUT_DIRECTORY_PATH
     if condition_config["searchEnable"]:
@@ -39,11 +81,15 @@ def condition_logic(page: Page):
         for i1, cond1 in enumerate(type_list):
             if i1 < wine_type_index:
                 continue
-            print(f"type_list, index={i1},value={cond1.text_content()}")
-            cond1.click()
-            page.wait_for_timeout(random.randrange(3000, 6000))
-            load_next_page(page)
-            cond1.click()
+            try:
+                print(f"type_list, index={i1},value={cond1.text_content()}")
+                cond1.click()
+                page.wait_for_timeout(random.randrange(3000, 6000))
+                load_next_page(page)
+                cond1.click()
+                condition_config["wineTypeIndex"] = i1
+            except:
+                continue
 
     if condition_config["scoreEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_rate_list"
@@ -54,11 +100,14 @@ def condition_logic(page: Page):
         for i2, cond2 in enumerate(score_list):
             if i2 < score_index:
                 continue
-            print(f"rate_list, index={i2},value={cond2.text_content()}")
-            cond2.click()
-            page.wait_for_timeout(random.randrange(1000, 3000))
-            load_next_page(page)
-
+            try:
+                print(f"rate_list, index={i2},value={cond2.text_content()}")
+                cond2.click()
+                page.wait_for_timeout(random.randrange(1000, 3000))
+                load_next_page(page)
+                condition_config["scoreIndex"] = i2
+            except:
+                continue
     search_items = page.locator(
         "div.search-list > div.content > div.main-content > div.left-content > div.search-items")
     if condition_config["breedEnable"]:
@@ -69,11 +118,16 @@ def condition_logic(page: Page):
         for i3, cond3 in enumerate(breed):
             if i3 < breed_index:
                 continue
-            print(f"breed_list, index={i3},value={cond3.text_content()}")
-            cond3.click()
-            page.wait_for_timeout(random.randrange(1000, 3000))
-            load_next_page(page)
-            breed[0].click()
+            try:
+                print(f"breed_list, index={i3},value={cond3.text_content()}")
+                cond3.click()
+                page.wait_for_timeout(random.randrange(1000, 3000))
+                load_next_page(page)
+                breed[0].click()
+                condition_config["breedIndex"] = i3
+            except:
+                continue
+
     if condition_config["areaEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_area"
         # 产区 选项列表
@@ -82,12 +136,15 @@ def condition_logic(page: Page):
         for i4, cond4 in enumerate(area):
             if i4 < area_index:
                 continue
-            print(f"area_list, index={i4},value={cond4.text_content()}")
-            cond4.click()
-            page.wait_for_timeout(random.randrange(1000, 6000))
-            load_next_page(page)
-            area[0].click()
-
+            try:
+                print(f"area_list, index={i4},value={cond4.text_content()}")
+                cond4.click()
+                page.wait_for_timeout(random.randrange(1000, 6000))
+                load_next_page(page)
+                area[0].click()
+                condition_config["areaIndex"] = i4
+            except:
+                continue
     if condition_config["nationEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_nation"
         # 国家 选项列表
@@ -96,11 +153,15 @@ def condition_logic(page: Page):
         for i5, cond5 in enumerate(nation):
             if i5 < nation_index:
                 continue
-            print(f"nation, index={i5},value={cond5.text_content()}")
-            cond5.click()
-            page.wait_for_timeout(random.randrange(1000, 6000))
-            load_next_page(page)
-            nation[0].click()
+            try:
+                print(f"nation, index={i5},value={cond5.text_content()}")
+                cond5.click()
+                page.wait_for_timeout(random.randrange(1000, 6000))
+                load_next_page(page)
+                nation[0].click()
+                condition_config["nationIndex"] = i5
+            except:
+                continue
 
     if condition_config["styleEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_style"
@@ -110,11 +171,16 @@ def condition_logic(page: Page):
         for i6, cond6 in enumerate(style):
             if i6 < style_index:
                 continue
-            print(f"style, index={i6},value={cond6.text_content()}")
-            cond6.click()
-            page.wait_for_timeout(random.randrange(1000, 6000))
-            load_next_page(page)
-            style[0].click()
+            try:
+                print(f"style, index={i6},value={cond6.text_content()}")
+                cond6.click()
+                page.wait_for_timeout(random.randrange(1000, 6000))
+                load_next_page(page)
+                style[0].click()
+                condition_config["styleIndex"] = i6
+            except:
+                continue
+
     if condition_config["assortedEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_assorted"
         # 配餐 选项列表
@@ -123,11 +189,15 @@ def condition_logic(page: Page):
         for i7, cond7 in enumerate(assorted):
             if i7 < assorted_index:
                 continue
-            print(f"assorted, index={i7},value={cond7.text_content()}")
-            cond7.click()
-            page.wait_for_timeout(random.randrange(1000, 6000))
-            load_next_page(page)
-            assorted[0].click()
+            try:
+                print(f"assorted, index={i7},value={cond7.text_content()}")
+                cond7.click()
+                page.wait_for_timeout(random.randrange(1000, 6000))
+                load_next_page(page)
+                assorted[0].click()
+                condition_config["assortedIndex"] = i7
+            except:
+                continue
 
 
 def print_list(array):
@@ -140,20 +210,20 @@ def print_list(array):
 def run(pw: Playwright) -> None:
     browser = pw.chromium.launch(headless=condition_config["headless"], channel='chrome')
     context = browser.new_context()
-    page = context.new_page()
-
-    page.goto("https://vivino.cc/search/")
-    with page.expect_request("data:image/png;*"):
+    try:
+        page = context.new_page()
         page.on("response", on_response)
-        condition_logic(page)
-
-    # page.pause()
-    context.close()
-    browser.close()
+        page.goto("https://vivino.cc/search/")
+        with page.expect_request("data:image/png;*"):
+            condition_logic(page)
+    finally:
+        context.close()
+        browser.close()
 
 
 def handle_request(route, request):
     print(request.url)
+    current_page = 0
     new_url = request.url.replace("page=1", "page=" + str(current_page + 1))
     print(new_url)
     route.continue_(url=new_url)
@@ -271,8 +341,6 @@ def check_path():
     if not os.path.exists(OUTPUT_DIRECTORY_PATH):
         os.makedirs(OUTPUT_DIRECTORY_PATH)
         print(f"Directory '{OUTPUT_DIRECTORY_PATH}' created successfully.")
-    else:
-        print(f"Directory '{OUTPUT_DIRECTORY_PATH}' already exists.")
 
     # Configure logging to write to a file
     # logging.basicConfig(filename=OUTPUT_LOG_PATH, level=print)
@@ -291,15 +359,11 @@ def check_path():
             file_data.write('')
 
         print(f"File '{os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_FILE_NAME)}' created successfully.")
-    else:
-        print(f"File '{os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_FILE_NAME)}' already exists.")
 
     image_path = os.path.join(OUTPUT_DIRECTORY_PATH, "images")
     if not os.path.exists(image_path):
         os.makedirs(image_path)
         print(f"Directory '{image_path}' created successfully.")
-    else:
-        print(f"Directory '{image_path}' already exists.")
 
 
 def main():
@@ -307,7 +371,19 @@ def main():
     # start_monitor()
 
     with sync_playwright() as playwright:
-        run(playwright)
+        for n in range(condition_config["retryTimes"]):
+            error_flag = False
+            print(f"try again,times={n}")
+            try:
+                run(playwright)
+            except TimeoutError:
+                print("wait timeout exception occurred")
+                error_flag = True
+            except:
+                print("Something else went wrong")
+                error_flag = True
+            if not error_flag:
+                break
 
 
 main()

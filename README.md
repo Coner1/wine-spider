@@ -12,3 +12,9 @@
 1、选中就换位置了
 2、增加不选择的一项
 3、排序
+
+### startup
+
+```
+setsid python3 vivino_zh.py >out.log$(date +"%dT%H_%M_%S") 2>&1 &
+```
