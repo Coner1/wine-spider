@@ -24,7 +24,7 @@ def condition_logic(page: Page):
     elif condition_config["conditionLogic"] == "condition_logic_single_condition":
         condition_logic_single_condition(page)
     else:
-        print("error not function")
+        print(datetime.now(), "error not function")
 
 
 def condition_logic_combine_breed_area(page: Page):
@@ -41,26 +41,37 @@ def condition_logic_combine_breed_area(page: Page):
             continue
         try:
             cond3.click()
-
             for i4, cond4 in enumerate(area):
                 if i4 < area_index:
                     continue
-                print(f"time.now = {datetime.now()}")
-                print(
-                    f"breed_list, index={i3},value={cond3.text_content()}, area_list, index={i4},value={cond4.text_content()}")
                 try:
+                    print(datetime.now(),
+                          f"breed_list, index={i3}, "
+                          f"area_list, index={i4}, ")
                     cond4.click()
-                    page.wait_for_timeout(random.randrange(1000, 6000))
+                    page.wait_for_timeout(random.randrange(1000, 3000))
                     load_next_page(page)
-                    area[0].click()
-                    condition_config["areaIndex"] = i4
-                except:
+                except BaseException as e:
+                    print(datetime.now(), e)
+                    print(datetime.now(), f"cond4 error, continue")
                     continue
+                finally:
+                    condition_config["areaIndex"] = i4 + 1
+                    if "active" in area[0].get_attribute("class"):
+                        area[0].click()
+                    if "active" in area[1].get_attribute("class"):
+                        area[1].click()
 
-            breed[0].click()
-            condition_config["breedIndex"] = i3
-        except:
+        except BaseException as e:
+            print(datetime.now(), e)
+            print(datetime.now(), f"cond3 error, continue")
             continue
+        finally:
+            condition_config["breedIndex"] = i3 + 1
+            if "active" in breed[0].get_attribute("class"):
+                breed[0].click()
+            if "active" in breed[1].get_attribute("class"):
+                breed[1].click()
 
 
 def condition_logic_single_condition(page: Page):
@@ -82,14 +93,18 @@ def condition_logic_single_condition(page: Page):
             if i1 < wine_type_index:
                 continue
             try:
-                print(f"type_list, index={i1},value={cond1.text_content()}")
+                print(datetime.now(), f"type_list, index={i1},value={cond1.text_content()}")
                 cond1.click()
                 page.wait_for_timeout(random.randrange(3000, 6000))
                 load_next_page(page)
                 cond1.click()
-                condition_config["wineTypeIndex"] = i1
-            except:
+                condition_config["wineTypeIndex"] = i1 + 1
+            except BaseException as e:
+                print(datetime.now(), e)
                 continue
+            else:
+                OUTPUT_DIRECTORY_PATH = base_path
+                raise Exception("reopen page, clear memory")
 
     if condition_config["scoreEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_rate_list"
@@ -105,9 +120,14 @@ def condition_logic_single_condition(page: Page):
                 cond2.click()
                 page.wait_for_timeout(random.randrange(1000, 3000))
                 load_next_page(page)
-                condition_config["scoreIndex"] = i2
-            except:
+                condition_config["scoreIndex"] = i2 + 1
+            except BaseException as e:
+                print(e)
+                print(f"cond2 error, continue")
                 continue
+            else:
+                OUTPUT_DIRECTORY_PATH = base_path
+                raise Exception("reopen page, clear memory")
     search_items = page.locator(
         "div.search-list > div.content > div.main-content > div.left-content > div.search-items")
     if condition_config["breedEnable"]:
@@ -124,9 +144,14 @@ def condition_logic_single_condition(page: Page):
                 page.wait_for_timeout(random.randrange(1000, 3000))
                 load_next_page(page)
                 breed[0].click()
-                condition_config["breedIndex"] = i3
-            except:
+                condition_config["breedIndex"] = i3 + 1
+            except BaseException as e:
+                print(e)
+                print(f"cond3 error, continue")
                 continue
+            else:
+                OUTPUT_DIRECTORY_PATH = base_path
+                raise Exception("reopen page, clear memory")
 
     if condition_config["areaEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_area"
@@ -142,9 +167,15 @@ def condition_logic_single_condition(page: Page):
                 page.wait_for_timeout(random.randrange(1000, 6000))
                 load_next_page(page)
                 area[0].click()
-                condition_config["areaIndex"] = i4
-            except:
+                condition_config["areaIndex"] = i4 + 1
+            except BaseException as e:
+                print(e)
+                print(f"cond4 error, continue")
                 continue
+            else:
+                OUTPUT_DIRECTORY_PATH = base_path
+                raise Exception("reopen page, clear memory")
+
     if condition_config["nationEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_nation"
         # 国家 选项列表
@@ -159,9 +190,14 @@ def condition_logic_single_condition(page: Page):
                 page.wait_for_timeout(random.randrange(1000, 6000))
                 load_next_page(page)
                 nation[0].click()
-                condition_config["nationIndex"] = i5
-            except:
+                condition_config["nationIndex"] = i5 + 1
+            except BaseException as e:
+                print(e)
+                print(f"cond5 error, continue")
                 continue
+            else:
+                OUTPUT_DIRECTORY_PATH = base_path
+                raise Exception("reopen page, clear memory")
 
     if condition_config["styleEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_style"
@@ -177,9 +213,14 @@ def condition_logic_single_condition(page: Page):
                 page.wait_for_timeout(random.randrange(1000, 6000))
                 load_next_page(page)
                 style[0].click()
-                condition_config["styleIndex"] = i6
-            except:
+                condition_config["styleIndex"] = i6 + 1
+            except BaseException as e:
+                print(e)
+                print(f"cond6 error, continue")
                 continue
+            else:
+                OUTPUT_DIRECTORY_PATH = base_path
+                raise Exception("reopen page, clear memory")
 
     if condition_config["assortedEnable"]:
         OUTPUT_DIRECTORY_PATH = base_path + "_assorted"
@@ -195,9 +236,14 @@ def condition_logic_single_condition(page: Page):
                 page.wait_for_timeout(random.randrange(1000, 6000))
                 load_next_page(page)
                 assorted[0].click()
-                condition_config["assortedIndex"] = i7
-            except:
+                condition_config["assortedIndex"] = i7 + 1
+            except BaseException as e:
+                print(e)
+                print(f"cond7 error, continue")
                 continue
+            else:
+                OUTPUT_DIRECTORY_PATH = base_path
+                raise Exception("reopen page, clear memory")
 
 
 def print_list(array):
@@ -217,8 +263,14 @@ def run(pw: Playwright) -> None:
         with page.expect_request("data:image/png;*"):
             condition_logic(page)
     finally:
-        context.close()
-        browser.close()
+        try:
+            context.close()
+        except BaseException as e:
+            print(datetime.now(), e)
+        try:
+            browser.close()
+        except BaseException as e:
+            print(datetime.now(), e)
 
 
 def handle_request(route, request):
@@ -231,19 +283,29 @@ def handle_request(route, request):
 
 def on_response(resp: Response):
     if "nodeFind" in resp.request.url:
-        # print(resp.body().decode('utf-8'))
-        # print(resp.json())
-        json_obj = resp.json()
-        data_records = json_obj["data"]["records"]
-        # data_total = json_obj["data"]["total"]
-        # data_pages = json_obj["data"]["pages"]
-        append_to_file(data_records)
-        print(f"page data has appended to file")
+        try:
+            json_obj = resp.json()
+            print(datetime.now(), "on_response json_obj", json_obj["code"], json_obj["message"])
+            data_records = json_obj["data"]["records"]
+            # data_total = json_obj["data"]["total"]
+            # data_pages = json_obj["data"]["pages"]
+            if len(data_records) < 1:
+                append_to_file(data_records)
+                print(datetime.now(), f"page data has appended to file")
+            else:
+                print(datetime.now(), f"appended no data")
+        except BaseException as e:
+            print(datetime.now(), e)
+            print(datetime.now(), f"on_response nodeFind error, return")
     if "find-by-uuid" in resp.request.url:
-        # print(resp.request.url)
-        parsed = parse.urlparse(resp.request.url)
-        parsed_q = parse.parse_qs(parsed.query)
-        save_image(str(parsed_q["uuid"][0]) + ".png", resp.body())
+        try:
+            # print(resp.request.url)
+            parsed = parse.urlparse(resp.request.url)
+            parsed_q = parse.parse_qs(parsed.query)
+            save_image(str(parsed_q["uuid"][0]) + ".png", resp.body())
+        except BaseException as e:
+            print(datetime.now(), e)
+            print(datetime.now(), f"on_response find-by-uuid error, return")
 
 
 def load_next_page(page: Page):
@@ -251,10 +313,10 @@ def load_next_page(page: Page):
         right_content = page.locator("div.search-list > div.content > div.main-content > div.right-content")
         if "没有找到合适的葡萄酒" in right_content.text_content():
             break
-        while True:
+        for i1 in range(30):
             right_content = page.locator("div.search-list > div.content > div.main-content > div.right-content")
             loading_locator = right_content.locator("div.el-loading-mask")
-            print("waiting for loading, 1s")
+            print(datetime.now(), "waiting for loading, 1s")
             if loading_locator.count() <= 0:
                 break
             elif loading_locator.is_hidden():
@@ -263,7 +325,7 @@ def load_next_page(page: Page):
 
         next_button = right_content.locator("div.page > div > button.btn-next")
         if next_button.is_disabled():
-            print("this is last page, return break")
+            print(datetime.now(), "this is last page, return break")
             break
         next_button.click()
         page.wait_for_timeout(random.randrange(3000, 6000))
@@ -273,7 +335,7 @@ def load_next_page(page: Page):
 def one_page(right_content: Locator):
     page_num = right_content.locator("div.page > div > ul > li.number.active").text_content()
     cards = right_content.locator(".wine-card")
-    print(f"load completed,pageNum={page_num},pageCount={cards.count()}")
+    print(datetime.now(), f"load completed,pageNum={page_num},pageCount={cards.count()}")
     rows = []
     for row in cards.all():
         loc = row.locator(".wine-bottle > img")
@@ -315,8 +377,9 @@ def one_page(right_content: Locator):
 
 
 def append_to_file(array: []):
+    if len(array) < 1:
+        return
     check_path()
-
     with open(os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_FILE_NAME), mode="at", encoding="utf-8") as f:
         for item in array:
             json.dump(item, f, ensure_ascii=False)
@@ -329,18 +392,18 @@ def save_image(name, b):
     if not os.path.exists(image_full_path):
         with open(image_full_path, "wb") as f:
             f.write(b)
-            print(
-                f"image saved,path={image_full_path}")
+            print(datetime.now(),
+                  f"image saved,path={image_full_path}")
     else:
-        print(
-            f"image exists, path={image_full_path}")
+        print(datetime.now(),
+              f"image exists, path={image_full_path}")
 
 
 # Create the directory if it doesn't exist
 def check_path():
     if not os.path.exists(OUTPUT_DIRECTORY_PATH):
         os.makedirs(OUTPUT_DIRECTORY_PATH)
-        print(f"Directory '{OUTPUT_DIRECTORY_PATH}' created successfully.")
+        print(datetime.now(), f"Directory '{OUTPUT_DIRECTORY_PATH}' created successfully.")
 
     # Configure logging to write to a file
     # logging.basicConfig(filename=OUTPUT_LOG_PATH, level=print)
@@ -358,32 +421,33 @@ def check_path():
             # Write some initial content to the file if desired
             file_data.write('')
 
-        print(f"File '{os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_FILE_NAME)}' created successfully.")
+        print(datetime.now(), f"File '{os.path.join(OUTPUT_DIRECTORY_PATH, OUTPUT_FILE_NAME)}' created successfully.")
 
     image_path = os.path.join(OUTPUT_DIRECTORY_PATH, "images")
     if not os.path.exists(image_path):
         os.makedirs(image_path)
-        print(f"Directory '{image_path}' created successfully.")
+        print(datetime.now(), f"Directory '{image_path}' created successfully.")
 
 
 def main():
     # start monitor
     # start_monitor()
-
-    with sync_playwright() as playwright:
-        for n in range(condition_config["retryTimes"]):
-            error_flag = False
-            print(f"try again,times={n}")
-            try:
+    for n in range(condition_config["retryTimes"]):
+        error_flag = False
+        print(f"try again,times={n}")
+        try:
+            with sync_playwright() as playwright:
                 run(playwright)
-            except TimeoutError:
-                print("wait timeout exception occurred")
-                error_flag = True
-            except:
-                print("Something else went wrong")
-                error_flag = True
-            if not error_flag:
-                break
+        except TimeoutError as e:
+            print("wait timeout exception occurred")
+            print(e)
+            error_flag = True
+        except BaseException as e:
+            print("Something else went wrong")
+            print(e)
+            error_flag = True
+        if not error_flag:
+            break
 
 
 main()

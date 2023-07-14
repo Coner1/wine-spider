@@ -8,7 +8,7 @@
 condition_config = {
     "OUTPUT_DIRECTORY_PATH": "output/condition",
     "headless": False,
-    "conditionLogic": "condition_logic_single_condition",
+    "conditionLogic": "condition_logic_combine_breed_area",
     "retryTimes": 1000,
 
     "searchEnable": False,  # 搜索
@@ -21,10 +21,10 @@ condition_config = {
     "scoreIndex": 0,  # Vivino平均评分
 
     "breedEnable": True,  # 葡萄品种
-    "breedIndex": 32,  # 葡萄品种
+    "breedIndex": 60,  # 葡萄品种
 
     "areaEnable": True,  # 产区
-    "areaIndex": 0,  # 产区
+    "areaIndex": 80,  # 产区
 
     "nationEnable": True,  # 国家
     "nationIndex": 0,  # 国家

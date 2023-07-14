@@ -16,5 +16,6 @@
 ### startup
 
 ```
-setsid python3 vivino_zh.py >out.log$(date +"%dT%H_%M_%S") 2>&1 &
+cd /home/ubuntu/wine-spider-combine-breed-area_breed_100
+setsid python3 vivino_zh.py &>> out.log$(date "+%d_%H%M") 2>&1 &
 ```
