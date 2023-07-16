@@ -18,4 +18,5 @@
 ```
 cd /home/ubuntu/wine-spider-combine-breed-area_breed_100
 setsid python3 vivino_zh.py &>> out.log$(date "+%d_%H%M") 2>&1 &
+setsid python3 wine-spider-combine-breed-area_breed_100/vivino_zh.py &>> out.log 2>&1 &
 ```
