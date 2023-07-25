@@ -23,6 +23,8 @@ def condition_logic(page: Page):
         condition_logic_combine_breed_area(page)
     elif condition_config["conditionLogic"] == "condition_logic_single_condition":
         condition_logic_single_condition(page)
+    elif condition_config["conditionLogic"] == "condition_logic_search":
+        condition_logic_search(page)
     else:
         print(datetime.now(), "error not function")
 
@@ -72,6 +74,31 @@ def condition_logic_combine_breed_area(page: Page):
                 breed[0].click()
             if "active" in breed[1].get_attribute("class"):
                 breed[1].click()
+
+
+def condition_logic_search(page: Page):
+    global OUTPUT_DIRECTORY_PATH
+    if not condition_config["searchEnable"]:
+        return
+    search_input = page.locator(
+        "div > div.header > div > div > div.container-top > div.logo-search > div.search > div > div > input")
+    search_word_array = condition_config["searchWordArray"]
+    search_from_index = condition_config["searchFromIndex"]
+    for i, content in enumerate(search_word_array):
+        if i < search_from_index:
+            continue
+        try:
+            print(datetime.now(), f"search, index={i}, content={content}")
+            search_input.type(content, delay=random.randrange(100, 3000))
+            page.wait_for_timeout(random.randrange(1000, 3000))
+            load_next_page(page)
+        except BaseException as e:
+            print(datetime.now(), e)
+            print(datetime.now(), f"cond4 error, continue")
+            continue
+        finally:
+            condition_config["searchFromIndex"] = i + 1
+            search_input.clear()
 
 
 def condition_logic_single_condition(page: Page):
@@ -260,8 +287,10 @@ def run(pw: Playwright) -> None:
         page = context.new_page()
         page.on("response", on_response)
         page.goto("https://vivino.cc/search/")
-        with page.expect_request("data:image/png;*"):
-            condition_logic(page)
+        page.wait_for_timeout(random.randrange(3000, 6000))
+        condition_logic(page)
+
+        page.wait_for_timeout(random.randrange(5000, 10000))
     finally:
         try:
             context.close()
@@ -289,7 +318,7 @@ def on_response(resp: Response):
             data_records = json_obj["data"]["records"]
             # data_total = json_obj["data"]["total"]
             # data_pages = json_obj["data"]["pages"]
-            if len(data_records) < 1:
+            if len(data_records) > 0:
                 append_to_file(data_records)
                 print(datetime.now(), f"page data has appended to file")
             else:
@@ -388,6 +417,7 @@ def append_to_file(array: []):
 
 def save_image(name, b):
     # Check if the file exists
+    check_path()
     image_full_path = os.path.join(os.path.join(OUTPUT_DIRECTORY_PATH, "images"), name)
     if not os.path.exists(image_full_path):
         with open(image_full_path, "wb") as f:
@@ -434,20 +464,21 @@ def main():
     # start_monitor()
     for n in range(condition_config["retryTimes"]):
         error_flag = False
-        print(f"try again,times={n}")
+        print(datetime.now(), f"try again,times={n}")
         try:
             with sync_playwright() as playwright:
                 run(playwright)
         except TimeoutError as e:
-            print("wait timeout exception occurred")
-            print(e)
+            print(datetime.now(), "wait timeout exception occurred")
+            print(datetime.now(), e)
             error_flag = True
         except BaseException as e:
-            print("Something else went wrong")
-            print(e)
+            print(datetime.now(), "Something else went wrong")
+            print(datetime.now(), e)
             error_flag = True
         if not error_flag:
             break
 
 
 main()
+print(datetime.now(), "all finished")
